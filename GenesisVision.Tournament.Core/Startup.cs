@@ -1,4 +1,6 @@
 ﻿using GenesisVision.DataModel;
+using GenesisVision.Tournament.Core.Services;
+using GenesisVision.Tournament.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +40,8 @@ namespace GenesisVision.Tournament.Core
                     {
                         options.SerializerSettings.DateFormatString = "yyyy-MM-ddTHH\\:mm\\:ss.fffffffzzz";
                     });
+
+            services.AddTransient<ITournamentService, TournamentService>();
 
             services.AddSwaggerGen(c =>
             {
