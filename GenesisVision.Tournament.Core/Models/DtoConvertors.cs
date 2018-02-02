@@ -27,6 +27,15 @@ namespace GenesisVision.Tournament.Core.Models
                    };
         }
 
+        public static TradeAccount ToTradeAccount(this TradeAccounts t)
+        {
+            return new TradeAccount
+                   {
+                       Id = t.Id,
+                       Login = t.Login
+                   };
+        }
+
         public static ViewModels.TradeServer.Tournament ToTournament(this Tournaments t)
         {
             return new ViewModels.TradeServer.Tournament

@@ -32,6 +32,15 @@ namespace GenesisVision.Tournament.Core
             services.AddEntityFrameworkNpgsql()
                     .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString, dbContextOptions));
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyMethod()
+                                      .AllowAnyHeader()
+                                      .AllowCredentials());
+            });
+
             services.AddMvcCore()
                     .AddApiExplorer()
                     .AddDataAnnotations()
@@ -70,6 +79,8 @@ namespace GenesisVision.Tournament.Core
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors("CorsPolicy");
 
             app.UseMvcWithDefaultRoute();
 

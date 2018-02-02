@@ -58,8 +58,12 @@ namespace GenesisVision.Tournament.Core.Controllers
         [Route("newTrade")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
-        public IActionResult NewTrade()
+        public IActionResult NewTrade([FromBody]NewTrade trade)
         {
+            var res = tradeServerService.NewTrade(trade);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res));
+
             return Ok();
         }
     }

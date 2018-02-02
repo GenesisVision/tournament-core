@@ -10,5 +10,7 @@ namespace GenesisVision.Tournament.Core.Services.Interfaces
         OperationResult<TradeServerViewModel> GetInitData(Guid tradeServerId);
 
         OperationResult TradeAccountsCreated(List<AccountCreated> accounts);
+
+        OperationResult NewTrade(NewTrade trade);
     }
 }

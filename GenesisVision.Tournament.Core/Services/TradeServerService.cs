@@ -1,11 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using GenesisVision.DataModel;
+﻿using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.TradeServer;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace GenesisVision.Tournament.Core.Services
 {
@@ -35,10 +37,16 @@ namespace GenesisVision.Tournament.Core.Services
                                              .Select(x => x.ToParticipantRequest())
                                              .ToList();
 
+                var tradeAccounts = context.TradeAccounts
+                                           .Where(x => x.TradeServerId == tradeServerId)
+                                           .Select(x => x.ToTradeAccount())
+                                           .ToList();
+
                 return new TradeServerViewModel
                        {
                            Tournament = tournament,
-                           ParticipantRequest = newParticipants
+                           ParticipantRequest = newParticipants,
+                           TradeAccounts = tradeAccounts
                        };
             });
         }
@@ -74,6 +82,76 @@ namespace GenesisVision.Tournament.Core.Services
                     context.SaveChanges();
                 }
             });
+        }
+
+        public OperationResult NewTrade(NewTrade trade)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var account = context.TradeAccounts
+                                     .Include(x => x.Trades)
+                                     .FirstOrDefault(x => x.Id == trade.TradeAccountId);
+                if (account == null)
+                    return;
+
+                var t = new Trades
+                        {
+                            Id = Guid.NewGuid(),
+                            TradeAccountId = account.Id,
+                            Date = trade.Date,
+                            Direction = trade.Direction,
+                            Price = trade.Price,
+                            Profit = trade.Profit,
+                            Symbol = trade.Symbol,
+                            Ticket = trade.Ticket,
+                            Volume = trade.Volume
+                        };
+                context.Add(t);
+
+                account.OrdersCount += 1;
+                account.TotalProfit += trade.Profit;
+                account.TotalProfitInPercent = account.TotalProfit / account.StartBalance * 100m;
+
+                RecalculateChart(account);
+
+                context.SaveChanges();
+            });
+        }
+
+        private void RecalculateChart(TradeAccounts account, int pointsCount = 15, ChartType type = ChartType.ByProfit)
+        {
+            var result = new List<decimal> {0};
+
+            var statistic = account.Trades
+                                   .OrderBy(x => x.Date)
+                                   .Select(x => x.Profit)
+                                   .ToList();
+
+            var list = new List<List<decimal>>();
+            var step = statistic.Count <= pointsCount
+                ? 1
+                : statistic.Count % pointsCount >= pointsCount / 3
+                    ? statistic.Count / pointsCount + 1
+                    : statistic.Count / pointsCount;
+
+            var count = 0;
+            do
+            {
+                list.Add(statistic.Skip(count).Take(step).ToList());
+                count += step;
+            } while (count < statistic.Count);
+
+            if (!list.Any() || !list.First().Any())
+                return;
+
+            switch (type)
+            {
+                case ChartType.ByProfit:
+                    result = list
+                        .Select(x => x.Average(y => y))
+                        .ToList();
+                    break;
+            }
         }
     }
 }
