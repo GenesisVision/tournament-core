@@ -42,6 +42,7 @@ namespace GenesisVision.Tournament.Core
                     });
 
             services.AddTransient<ITournamentService, TournamentService>();
+            services.AddTransient<ITradeServerService, TradeServerService>();
 
             services.AddSwaggerGen(c =>
             {
