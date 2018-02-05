@@ -1,6 +1,7 @@
 ﻿using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.TradeServer;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -10,7 +11,8 @@ using System.Collections.Generic;
 
 namespace GenesisVision.Tournament.Core.Controllers
 {
-    [Route("api/tradeserver")]
+	[EnableCors("AllowSpecificOrigin")]
+	[Route("api/tradeserver")]
     public class TradeServerController : BaseController
     {
         private readonly ITradeServerService tradeServerService;
