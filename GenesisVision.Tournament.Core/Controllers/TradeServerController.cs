@@ -11,7 +11,6 @@ using System.Collections.Generic;
 
 namespace GenesisVision.Tournament.Core.Controllers
 {
-	[EnableCors("AllowSpecificOrigin")]
 	[Route("api/tradeserver")]
     public class TradeServerController : BaseController
     {

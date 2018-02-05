@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace GenesisVision.Tournament.Core.Controllers
 {
-	[EnableCors("AllowSpecificOrigin")]
 	[Route("api/files")]
     public class FilesController : BaseController
     {
