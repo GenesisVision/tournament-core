@@ -34,7 +34,9 @@ namespace GenesisVision.Tournament.Core.Services
                                       Id = Guid.NewGuid(),
                                       RegDate = DateTime.Now,
                                       Email = model.Email.Trim(),
-                                      Name = model.Name.Trim()
+                                      Name = model.Name.Trim(),
+                                      EthAddress = model.EthAddress,
+                                      Avatar = model.Avatar
                                   };
                 context.Add(participant);
                 context.SaveChanges();

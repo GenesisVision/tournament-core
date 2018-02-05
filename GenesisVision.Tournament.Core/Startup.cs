@@ -1,4 +1,5 @@
 ﻿using GenesisVision.DataModel;
+using GenesisVision.Tournament.Core.Infrastructure;
 using GenesisVision.Tournament.Core.Services;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
@@ -67,6 +68,7 @@ namespace GenesisVision.Tournament.Core
                                    });
                 c.DescribeAllEnumsAsStrings();
                 c.TagActionsBy(x => x.RelativePath.Split("/").Take(2).Last());
+                c.OperationFilter<FileUploadOperation>();
 
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, "GenesisVision.Tournament.Core.xml");
                 c.IncludeXmlComments(xmlPath);
@@ -75,12 +77,14 @@ namespace GenesisVision.Tournament.Core
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || bool.Parse(Configuration["IsDevelopment"]))
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseCors("CorsPolicy");
+
+            app.UseStaticFiles();
 
             app.UseMvcWithDefaultRoute();
 

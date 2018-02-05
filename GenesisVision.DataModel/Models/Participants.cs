@@ -8,6 +8,8 @@ namespace GenesisVision.DataModel.Models
         public string Email { get; set; }
         public string Name { get; set; }
         public DateTime RegDate { get; set; }
+        public string Avatar { get; set; }
+        public string EthAddress { get; set; }
 
         public TradeAccounts TradeAccount { get; set; }
     }

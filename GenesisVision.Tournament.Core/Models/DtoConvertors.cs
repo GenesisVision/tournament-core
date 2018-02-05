@@ -23,7 +23,9 @@ namespace GenesisVision.Tournament.Core.Models
                    {
                        Email = request.Email,
                        Id = request.Id,
-                       Name = request.Name
+                       Name = request.Name,
+                       EthAddress = request.EthAddress,
+                       Avatar = request.Avatar
                    };
         }
 
