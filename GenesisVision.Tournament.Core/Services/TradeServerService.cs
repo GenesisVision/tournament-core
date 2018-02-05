@@ -90,6 +90,7 @@ namespace GenesisVision.Tournament.Core.Services
             {
                 var account = context.TradeAccounts
                                      .Include(x => x.Trades)
+                                     .Include(x => x.Charts)
                                      .FirstOrDefault(x => x.Id == trade.TradeAccountId);
                 if (account == null)
                     return;
@@ -151,6 +152,22 @@ namespace GenesisVision.Tournament.Core.Services
                         .Select(x => x.Average(y => y))
                         .ToList();
                     break;
+            }
+
+            context.RemoveRange(account.Charts.Where(x => x.Type == type));
+
+            var index = 0;
+            foreach (var chart in result)
+            {
+                context.Add(new Charts
+                            {
+                                Id = Guid.NewGuid(),
+                                Type = type,
+                                Index = index,
+                                TradeAccountId = account.Id,
+                                Value = chart
+                            });
+                index++;
             }
         }
     }

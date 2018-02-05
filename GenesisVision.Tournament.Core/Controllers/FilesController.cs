@@ -31,7 +31,7 @@ namespace GenesisVision.Tournament.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public async Task<IActionResult> UploadFile(IFormFile uploadedFile)
         {
-            if (uploadedFile.Length == 0)
+            if (uploadedFile == null || uploadedFile.Length == 0)
                 return BadRequest(ErrorResult.GetResult(new List<string> {"File is empty"}));
             
             var fileName = Guid.NewGuid() + (uploadedFile.FileName.Contains(".")

@@ -15,6 +15,14 @@ using System.Linq;
 
 namespace GenesisVision.Tournament.Core
 {
+    public static class CorsMiddlewareExtensions
+    {
+        public static IApplicationBuilder UseCorsMiddleware(this IApplicationBuilder builder)
+        {
+            return builder.UseMiddleware<CorsMiddleware>();
+        }
+    }
+
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -32,16 +40,7 @@ namespace GenesisVision.Tournament.Core
 
             services.AddEntityFrameworkNpgsql()
                     .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString, dbContextOptions));
-
-            services.AddCors(options =>
-            {
-                options.AddPolicy("CorsPolicy",
-                    builder => builder.AllowAnyOrigin()
-                                      .AllowAnyMethod()
-                                      .AllowAnyHeader()
-                                      .AllowCredentials());
-            });
-
+            
             services.AddMvcCore()
                     .AddApiExplorer()
                     .AddDataAnnotations()
@@ -81,11 +80,10 @@ namespace GenesisVision.Tournament.Core
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            app.UseCors("CorsPolicy");
+            
+            app.UseCorsMiddleware();
 
             app.UseStaticFiles();
-
             app.UseMvcWithDefaultRoute();
 
             app.UseSwagger();
