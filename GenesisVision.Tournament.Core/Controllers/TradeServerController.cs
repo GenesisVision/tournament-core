@@ -3,6 +3,7 @@ using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.TradeServer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
@@ -13,10 +14,12 @@ namespace GenesisVision.Tournament.Core.Controllers
     public class TradeServerController : BaseController
     {
         private readonly ITradeServerService tradeServerService;
+        private readonly ILogger<TradeServerController> logger;
 
-        public TradeServerController(ITradeServerService tradeServerService)
+        public TradeServerController(ITradeServerService tradeServerService, ILogger<TradeServerController> logger)
         {
             this.tradeServerService = tradeServerService;
+            this.logger = logger;
         }
 
         /// <summary>
