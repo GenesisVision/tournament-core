@@ -1,6 +1,7 @@
 ﻿using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.Tournament;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -8,7 +9,8 @@ using System.Collections.Generic;
 
 namespace GenesisVision.Tournament.Core.Controllers
 {
-    [Route("api/tournament")]
+	[EnableCors("AllowSpecificOrigin")]
+	[Route("api/tournament")]
     public class TournamentController : BaseController
     {
         private readonly ITournamentService tournamentService;
