@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GenesisVision.Tournament.Core.Controllers
 {
@@ -37,9 +38,9 @@ namespace GenesisVision.Tournament.Core.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ErrorResult.GetResult(ModelState));
 
-            var state = tournamentService.CheckEmailExists(model);
-            if (!state.IsSuccess || state.Data)
-                return BadRequest(ErrorResult.GetResult(new List<string> {"Email already registered"}, ErrorCodes.ValidationError));
+            var state = tournamentService.CheckNewParticipant(model);
+            if (!state.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(state));
 
             var res = tournamentService.RegisterParticipant(model);
             if (!res.IsSuccess)
