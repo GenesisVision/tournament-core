@@ -1,4 +1,5 @@
-﻿using GenesisVision.Tournament.Core.Models;
+﻿using GenesisVision.Tournament.Core.Infrastructure;
+using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.TradeServer;
 using Microsoft.AspNetCore.Cors;
@@ -11,7 +12,7 @@ using System.Collections.Generic;
 
 namespace GenesisVision.Tournament.Core.Controllers
 {
-	[EnableCors("AllowSpecificOrigin")]
+    [EnableCors("AllowSpecificOrigin")]
 	[Route("api/tradeserver")]
     public class TradeServerController : BaseController
     {
@@ -33,6 +34,9 @@ namespace GenesisVision.Tournament.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult GetInitData(Guid tradeServerId)
         {
+            if (!HttpContext.IsLocalRequest())
+                return BadRequest();
+
             var res = tradeServerService.GetInitData(tradeServerId);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res));
@@ -49,6 +53,9 @@ namespace GenesisVision.Tournament.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult TradeAccountCreated([FromBody]List<AccountCreated> accounts)
         {
+            if (!HttpContext.IsLocalRequest())
+                return BadRequest();
+
             var res = tradeServerService.TradeAccountsCreated(accounts);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res));
@@ -65,6 +72,9 @@ namespace GenesisVision.Tournament.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult NewTrade([FromBody]NewTrade trade)
         {
+            if (!HttpContext.IsLocalRequest())
+                return BadRequest();
+
             var res = tradeServerService.NewTrade(trade);
             if (!res.IsSuccess)
                 return BadRequest(ErrorResult.GetResult(res));
