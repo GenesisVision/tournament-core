@@ -8,5 +8,7 @@ namespace GenesisVision.Tournament.Core.Services.Interfaces
         OperationResult<bool> CheckEmailExists(NewParticipant model);
 
         OperationResult RegisterParticipant(NewParticipant model);
+
+        OperationResult<ParticipantsSummaryViewModel> GetParticipantsSummary();
     }
 }

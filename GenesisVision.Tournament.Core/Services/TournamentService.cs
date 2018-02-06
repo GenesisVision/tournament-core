@@ -42,5 +42,20 @@ namespace GenesisVision.Tournament.Core.Services
                 context.SaveChanges();
             });
         }
+
+        public OperationResult<ParticipantsSummaryViewModel> GetParticipantsSummary()
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                var count = context.Participants.Count();
+                var lastDate = context.Participants.OrderByDescending(x => x.RegDate).FirstOrDefault();
+
+                return new ParticipantsSummaryViewModel
+                       {
+                           ParticipantsCount = count,
+                           LastRegistrationDate = lastDate?.RegDate
+                       };
+            });
+        }
     }
 }

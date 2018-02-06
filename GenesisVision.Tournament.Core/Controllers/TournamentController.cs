@@ -54,8 +54,8 @@ namespace GenesisVision.Tournament.Core.Controllers
         /// </summary>
         [HttpPost]
         [Route("participants")]
-        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(void))]
-        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ParticipantsViewModel))]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ParticipantsViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult Participants([FromBody]ParticipantsFilter filter)
         {
             return Ok(new ParticipantsViewModel
@@ -63,6 +63,22 @@ namespace GenesisVision.Tournament.Core.Controllers
                           Participants = new List<ParticipantViewModel>(),
                           Total = 0
                       });
+        }
+
+        /// <summary>
+        /// Participants summary
+        /// </summary>
+        [HttpPost]
+        [Route("participants/count")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ParticipantsSummaryViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetParticipantsSummary()
+        {
+            var res = tournamentService.GetParticipantsSummary();
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res));
+
+            return Ok(res.Data);
         }
     }
 }
