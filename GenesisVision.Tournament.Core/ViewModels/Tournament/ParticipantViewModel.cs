@@ -6,8 +6,8 @@ namespace GenesisVision.Tournament.Core.ViewModels.Tournament
     public class ParticipantViewModel
     {
         public Guid Id { get; set; }
-        public string Email { get; set; }
         public string Name { get; set; }
+        public string Avatar { get; set; }
         public DateTime RegDate { get; set; }
         public long Login { get; set; }
         public string IpfsHash { get; set; }

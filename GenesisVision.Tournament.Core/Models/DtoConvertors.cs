@@ -1,4 +1,8 @@
-﻿using GenesisVision.DataModel.Models;
+﻿using System.Collections.Generic;
+using System.Linq;
+using GenesisVision.DataModel.Enums;
+using GenesisVision.DataModel.Models;
+using GenesisVision.Tournament.Core.ViewModels.Tournament;
 using GenesisVision.Tournament.Core.ViewModels.TradeServer;
 
 namespace GenesisVision.Tournament.Core.Models
@@ -50,6 +54,44 @@ namespace GenesisVision.Tournament.Core.Models
                        IsEnabled = t.IsEnabled,
                        RegisterDateFrom = t.RegisterDateFrom,
                        RegisterDateTo = t.RegisterDateTo
+                   };
+        }
+
+        public static ParticipantViewModel ToParticipantViewModel(this Participants x)
+        {
+            return new ParticipantViewModel
+                   {
+                       Id = x.Id,
+                       RegDate = x.RegDate,
+                       Name = x.Name,
+                       Avatar = x.Avatar,
+                       Place = 0,
+                       IpfsHash = x.TradeAccount?.IpfsHash,
+                       Login = x.TradeAccount?.Login ?? 0,
+                       OrdersCount = x.TradeAccount?.OrdersCount ?? 0,
+                       TotalProfit = x.TradeAccount?.TotalProfit ?? 0,
+                       TotalProfitInPercent = x.TradeAccount?.TotalProfitInPercent ?? 0,
+                       Chart = x.TradeAccount?
+                                .Charts?
+                                .Where(c => c.Type == ChartType.ByProfit)
+                                .OrderBy(c => c.Index)
+                                .Select(c => c.Value)
+                                .ToList() ?? new List<decimal>()
+                   };
+        }
+
+        public static TradeViewModel ToTradeViewModel(this Trades t)
+        {
+            return new TradeViewModel
+                   {
+                       Id = t.Id,
+                       Date = t.Date,
+                       Direction = t.Direction,
+                       Price = t.Price,
+                       Profit = t.Profit,
+                       Symbol = t.Symbol,
+                       Ticket = t.Ticket,
+                       Volume = t.Volume
                    };
         }
     }

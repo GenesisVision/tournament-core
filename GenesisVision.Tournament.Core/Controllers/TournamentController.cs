@@ -1,4 +1,5 @@
-﻿using GenesisVision.Tournament.Core.Models;
+﻿using System;
+using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.Tournament;
 using Microsoft.AspNetCore.Cors;
@@ -58,10 +59,14 @@ namespace GenesisVision.Tournament.Core.Controllers
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
         public IActionResult Participants([FromBody]ParticipantsFilter filter)
         {
+            var res = tournamentService.GetParticipants(filter);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res));
+
             return Ok(new ParticipantsViewModel
                       {
-                          Participants = new List<ParticipantViewModel>(),
-                          Total = 0
+                          Participants = res.Data.Item1,
+                          Total = res.Data.Item2
                       });
         }
 
@@ -79,6 +84,42 @@ namespace GenesisVision.Tournament.Core.Controllers
                 return BadRequest(ErrorResult.GetResult(res));
 
             return Ok(res.Data);
+        }
+
+        /// <summary>
+        /// Participant info
+        /// </summary>
+        [HttpGet]
+        [Route("participant")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ParticipantViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetParticipant(Guid participantId)
+        {
+            var res = tournamentService.GetParticipant(participantId);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res));
+
+            return Ok(res.Data);
+        }
+
+        /// <summary>
+        /// Participant trades history
+        /// </summary>
+        [HttpPost]
+        [Route("participant/trades")]
+        [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(TradesViewModel))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
+        public IActionResult GetParticipantTrades([FromBody]TradesFilter filter)
+        {
+            var res = tournamentService.GetParticipantTrades(filter);
+            if (!res.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(res));
+
+            return Ok(new TradesViewModel
+                      {
+                          Trades = res.Data.Item1,
+                          Total = res.Data.Item2
+                      });
         }
     }
 }
