@@ -68,7 +68,7 @@ namespace GenesisVision.Tournament.Core.Controllers
         /// <summary>
         /// Participants summary
         /// </summary>
-        [HttpPost]
+        [HttpGet]
         [Route("participants/count")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ParticipantsSummaryViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]
