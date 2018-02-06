@@ -12,5 +12,6 @@ namespace GenesisVision.Tournament.Core.ViewModels.TradeServer
         public DateTime? RegisterDateFrom { get; set; }
         public DateTime? RegisterDateTo { get; set; }
         public bool IsEnabled { get; set; }
+        public decimal StartDeposit { get; set; }
     }
 }

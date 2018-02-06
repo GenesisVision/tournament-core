@@ -53,7 +53,8 @@ namespace GenesisVision.Tournament.Core.Models
                        DateTo = t.DateTo,
                        IsEnabled = t.IsEnabled,
                        RegisterDateFrom = t.RegisterDateFrom,
-                       RegisterDateTo = t.RegisterDateTo
+                       RegisterDateTo = t.RegisterDateTo,
+                       StartDeposit = t.StartDeposit
                    };
         }
 

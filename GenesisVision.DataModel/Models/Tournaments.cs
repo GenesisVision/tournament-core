@@ -13,6 +13,7 @@ namespace GenesisVision.DataModel.Models
         public DateTime? RegisterDateFrom { get; set; }
         public DateTime? RegisterDateTo { get; set; }
         public bool IsEnabled { get; set; }
+        public decimal StartDeposit { get; set; }
 
         public ICollection<TradeAccounts> TradeAccounts { get; set; }
     }
