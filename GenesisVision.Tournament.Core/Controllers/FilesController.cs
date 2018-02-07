@@ -1,7 +1,6 @@
 ﻿using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.ViewModels.Files;
 using HeyRed.Mime;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace GenesisVision.Tournament.Core.Controllers
 {
-	[Route("api/files")]
+    [Route("api/files")]
     public class FilesController : BaseController
     {
         private readonly string uploadPath;

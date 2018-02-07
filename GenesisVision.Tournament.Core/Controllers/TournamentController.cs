@@ -1,17 +1,15 @@
-﻿using System;
-using GenesisVision.Tournament.Core.Models;
+﻿using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.Tournament;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Collections.Generic;
+using System;
 
 namespace GenesisVision.Tournament.Core.Controllers
 {
-	[Route("api/tournament")]
+    [Route("api/tournament")]
     public class TournamentController : BaseController
     {
         private readonly ITournamentService tournamentService;
@@ -37,9 +35,9 @@ namespace GenesisVision.Tournament.Core.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ErrorResult.GetResult(ModelState));
 
-            var state = tournamentService.CheckEmailExists(model);
-            if (!state.IsSuccess || state.Data)
-                return BadRequest(ErrorResult.GetResult(new List<string> {"Email already registered"}, ErrorCodes.ValidationError));
+            var state = tournamentService.CheckNewParticipant(model);
+            if (!state.IsSuccess)
+                return BadRequest(ErrorResult.GetResult(state));
 
             var res = tournamentService.RegisterParticipant(model);
             if (!res.IsSuccess)
@@ -72,7 +70,7 @@ namespace GenesisVision.Tournament.Core.Controllers
         /// <summary>
         /// Participants summary
         /// </summary>
-        [HttpPost]
+        [HttpGet]
         [Route("participants/count")]
         [SwaggerResponse(StatusCodes.Status200OK, Type = typeof(ParticipantsSummaryViewModel))]
         [SwaggerResponse(StatusCodes.Status400BadRequest, Type = typeof(ErrorViewModel))]

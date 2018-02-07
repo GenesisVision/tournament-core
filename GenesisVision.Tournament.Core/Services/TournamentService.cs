@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using GenesisVision.DataModel;
 using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
@@ -8,6 +6,8 @@ using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.Tournament;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 
 namespace GenesisVision.Tournament.Core.Services
 {
@@ -20,11 +20,17 @@ namespace GenesisVision.Tournament.Core.Services
             this.context = context;
         }
 
-        public OperationResult<bool> CheckEmailExists(NewParticipant model)
+        public OperationResult CheckNewParticipant(NewParticipant model)
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                return context.Participants.Any(x => x.Email.ToLower() == model.Email.ToLower().Trim());
+                var tournament = context.Tournaments.FirstOrDefault();
+                if (tournament == null || !tournament.IsEnabled || (tournament.RegisterDateTo.HasValue && tournament.RegisterDateTo < DateTime.Now))
+                    throw new Exception("Registration is closed");
+
+                var exist = context.Participants.Any(x => x.Email.ToLower() == model.Email.ToLower().Trim());
+                if (exist)
+                    throw new Exception("Email already registered");
             });
         }
 

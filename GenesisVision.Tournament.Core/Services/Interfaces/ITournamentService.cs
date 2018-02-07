@@ -7,7 +7,7 @@ namespace GenesisVision.Tournament.Core.Services.Interfaces
 {
     public interface ITournamentService
     {
-        OperationResult<bool> CheckEmailExists(NewParticipant model);
+        OperationResult CheckNewParticipant(NewParticipant model);
 
         OperationResult RegisterParticipant(NewParticipant model);
 
