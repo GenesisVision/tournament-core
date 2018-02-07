@@ -108,10 +108,10 @@ namespace GenesisVision.Tournament.Core.Services
             {
                 var participant = context.Participants
                                          .Include(x => x.TradeAccount)
-                                         .ThenInclude(x => x.Charts)
+                                         .ThenInclude(x => x.Trades)
                                          .FirstOrDefault(x => x.Id == participantId);
 
-                return participant.ToParticipantViewModel();
+                return participant.ToParticipantFullChartViewModel();
             });
         }
 

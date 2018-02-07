@@ -81,6 +81,28 @@ namespace GenesisVision.Tournament.Core.Models
                    };
         }
 
+        public static ParticipantViewModel ToParticipantFullChartViewModel(this Participants x)
+        {
+            return new ParticipantViewModel
+                   {
+                       Id = x.Id,
+                       RegDate = x.RegDate,
+                       Name = x.Name,
+                       Avatar = x.Avatar,
+                       Place = 0,
+                       IpfsHash = x.TradeAccount?.IpfsHash,
+                       Login = x.TradeAccount?.Login ?? 0,
+                       OrdersCount = x.TradeAccount?.OrdersCount ?? 0,
+                       TotalProfit = x.TradeAccount?.TotalProfit ?? 0,
+                       TotalProfitInPercent = x.TradeAccount?.TotalProfitInPercent ?? 0,
+                       Chart = x.TradeAccount?
+                                .Trades?
+                                .OrderBy(c => c.Ticket)
+                                .Select(c => c.Profit)
+                                .ToList() ?? new List<decimal>()
+                   };
+        }
+
         public static TradeViewModel ToTradeViewModel(this Trades t)
         {
             return new TradeViewModel
