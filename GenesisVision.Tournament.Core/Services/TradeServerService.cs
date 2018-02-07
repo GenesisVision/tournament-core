@@ -149,7 +149,7 @@ namespace GenesisVision.Tournament.Core.Services
             {
                 case ChartType.ByProfit:
                     result = list
-                        .Select(x => x.Average(y => y))
+                        .Select(x => Math.Round(x.Average(y => y), 2))
                         .ToList();
                     break;
             }

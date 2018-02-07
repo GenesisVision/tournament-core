@@ -68,6 +68,7 @@ namespace GenesisVision.Tournament.Core.Services
                 var query = context.Participants
                                    .Include(x => x.TradeAccount)
                                    .ThenInclude(x => x.Charts)
+                                   .OrderByDescending(x => x.TradeAccount.TotalProfit)
                                    .Where(x => x.TradeAccount != null);
 
                 var total = query.Count();
@@ -81,8 +82,6 @@ namespace GenesisVision.Tournament.Core.Services
                 }
 
                 var result = query
-                    .OrderBy(x => x.TradeAccount.TotalProfit)
-                    .ToList()
                     .Select(x => x.ToParticipantViewModel())
                     .ToList();
 
