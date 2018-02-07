@@ -15,14 +15,6 @@ using System.Linq;
 
 namespace GenesisVision.Tournament.Core
 {
-    public static class CorsMiddlewareExtensions
-    {
-        public static IApplicationBuilder UseCorsMiddleware(this IApplicationBuilder builder)
-        {
-            return builder.UseMiddleware<CorsMiddleware>();
-        }
-    }
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -41,15 +33,16 @@ namespace GenesisVision.Tournament.Core
             services.AddEntityFrameworkNpgsql()
                     .AddDbContext<ApplicationDbContext>(x => x.UseNpgsql(connectionString, dbContextOptions));
 
-			services.AddCors(options =>
-			{
-				options.AddPolicy("AllowSpecificOrigin", builder => builder
-				.WithOrigins("https://tournament.genesis.vision", "https://genesis.vision", "http://genesis.vision", "http://tournament.genesis.vision")
-				.AllowCredentials().AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-				);
-			});
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                                      .AllowAnyMethod()
+                                      .AllowAnyHeader()
+                                      .AllowCredentials());
+            });
 
-			services.AddMvcCore()
+            services.AddMvcCore()
                     .AddApiExplorer()
                     .AddDataAnnotations()
                     .AddJsonFormatters()
@@ -88,8 +81,8 @@ namespace GenesisVision.Tournament.Core
             {
                 app.UseDeveloperExceptionPage();
             }
-            
-            //app.UseCorsMiddleware();
+
+            app.UseCors("CorsPolicy");
 
             app.UseStaticFiles();
             app.UseMvcWithDefaultRoute();
