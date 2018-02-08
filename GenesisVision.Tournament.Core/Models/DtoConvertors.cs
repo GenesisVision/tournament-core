@@ -72,6 +72,7 @@ namespace GenesisVision.Tournament.Core.Models
                        OrdersCount = x.TradeAccount?.OrdersCount ?? 0,
                        TotalProfit = x.TradeAccount?.TotalProfit ?? 0,
                        TotalProfitInPercent = x.TradeAccount?.TotalProfitInPercent ?? 0,
+                       StartBalance = x.TradeAccount?.StartBalance ?? 0,
                        Chart = x.TradeAccount?
                                 .Charts?
                                 .Where(c => c.Type == ChartType.ByProfit)
@@ -95,6 +96,7 @@ namespace GenesisVision.Tournament.Core.Models
                        OrdersCount = x.TradeAccount?.OrdersCount ?? 0,
                        TotalProfit = x.TradeAccount?.TotalProfit ?? 0,
                        TotalProfitInPercent = x.TradeAccount?.TotalProfitInPercent ?? 0,
+                       StartBalance = x.TradeAccount?.StartBalance ?? 0,
                        Chart = x.TradeAccount?
                                 .Trades?
                                 .OrderBy(c => c.Ticket)

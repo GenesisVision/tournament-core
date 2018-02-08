@@ -12,6 +12,7 @@ namespace GenesisVision.Tournament.Core.ViewModels.Tournament
         public long Login { get; set; }
         public string IpfsHash { get; set; }
         public int OrdersCount { get; set; }
+        public decimal StartBalance { get; set; }
         public decimal TotalProfit { get; set; }
         public decimal TotalProfitInPercent { get; set; }
         public List<decimal> Chart { get; set; }
