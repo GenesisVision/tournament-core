@@ -91,7 +91,7 @@ namespace GenesisVision.Tournament.Core.Services
                     .Select(x => x.ToParticipantViewModel())
                     .ToList();
 
-                var place = 1;
+                var place = filter?.Skip + 1 ?? 1;
                 foreach (var x in result)
                 {
                     x.Place = place;
@@ -111,7 +111,16 @@ namespace GenesisVision.Tournament.Core.Services
                                          .ThenInclude(x => x.Trades)
                                          .FirstOrDefault(x => x.Id == participantId);
 
-                return participant.ToParticipantFullChartViewModel();
+                var places = context.Participants
+                                    .OrderByDescending(x => x.TradeAccount.TotalProfit)
+                                    .Where(x => x.TradeAccount != null)
+                                    .Select(x => x.Id)
+                                    .ToList();
+
+                var res = participant.ToParticipantFullChartViewModel();
+                res.Place = places.IndexOf(participantId) + 1;
+
+                return res;
             });
         }
 
