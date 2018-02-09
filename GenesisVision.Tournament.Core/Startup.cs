@@ -42,7 +42,8 @@ namespace GenesisVision.Tournament.Core
                                       .AllowCredentials());
             });
 
-            services.AddMvcCore()
+            services.AddMemoryCache()
+                    .AddMvcCore()
                     .AddApiExplorer()
                     .AddDataAnnotations()
                     .AddJsonFormatters()
@@ -53,6 +54,7 @@ namespace GenesisVision.Tournament.Core
 
             services.AddTransient<ITournamentService, TournamentService>();
             services.AddTransient<ITradeServerService, TradeServerService>();
+            services.AddTransient<IStatisticService, StatisticService>();
 
             services.AddSwaggerGen(c =>
             {

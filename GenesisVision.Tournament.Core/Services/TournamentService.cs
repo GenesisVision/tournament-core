@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
-using GenesisVision.DataModel;
-using GenesisVision.DataModel.Enums;
+﻿using GenesisVision.DataModel;
 using GenesisVision.DataModel.Models;
 using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
 using GenesisVision.Tournament.Core.ViewModels.Tournament;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace GenesisVision.Tournament.Core.Services
@@ -14,10 +13,12 @@ namespace GenesisVision.Tournament.Core.Services
     public class TournamentService : ITournamentService
     {
         private readonly ApplicationDbContext context;
+        private readonly IStatisticService statisticService;
 
-        public TournamentService(ApplicationDbContext context)
+        public TournamentService(ApplicationDbContext context, IStatisticService statisticService)
         {
             this.context = context;
+            this.statisticService = statisticService;
         }
 
         public OperationResult CheckNewParticipant(NewParticipant model)
@@ -71,31 +72,26 @@ namespace GenesisVision.Tournament.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
+                var participants = statisticService.GetParticipantsByPlace(filter?.Skip, filter?.Take);
+                if (!participants.Any())
+                    return (new List<ParticipantViewModel>(), 0);
+
                 var query = context.Participants
                                    .Include(x => x.TradeAccount)
                                    .ThenInclude(x => x.Charts)
-                                   .OrderByDescending(x => x.TradeAccount.TotalProfit)
-                                   .Where(x => x.TradeAccount != null);
+                                   .Where(x => participants.Contains(x.Id));
 
-                var total = query.Count();
-
-                if (filter != null)
-                {
-                    if (filter.Skip.HasValue)
-                        query = query.Skip(filter.Skip.Value);
-                    if (filter.Take.HasValue)
-                        query = query.Take(filter.Take.Value);
-                }
+                var total = context.Participants.Count(x => x.TradeAccount != null);
 
                 var result = query
                     .Select(x => x.ToParticipantViewModel())
+                    .ToList()
+                    .OrderBy(x => participants.IndexOf(x.Id))
                     .ToList();
-
-                var place = filter?.Skip + 1 ?? 1;
+                
                 foreach (var x in result)
                 {
-                    x.Place = place;
-                    place++;
+                    x.Place = statisticService.GetParticipantPlace(x.Id);
                 }
 
                 return (result, total);
@@ -110,15 +106,9 @@ namespace GenesisVision.Tournament.Core.Services
                                          .Include(x => x.TradeAccount)
                                          .ThenInclude(x => x.Trades)
                                          .FirstOrDefault(x => x.Id == participantId);
-
-                var places = context.Participants
-                                    .OrderByDescending(x => x.TradeAccount.TotalProfit)
-                                    .Where(x => x.TradeAccount != null)
-                                    .Select(x => x.Id)
-                                    .ToList();
-
+                
                 var res = participant.ToParticipantFullChartViewModel();
-                res.Place = places.IndexOf(participantId) + 1;
+                res.Place = statisticService.GetParticipantPlace(participantId);
 
                 return res;
             });

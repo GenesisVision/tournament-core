@@ -8,16 +8,19 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace GenesisVision.Tournament.Core.Services
 {
     public class TradeServerService : ITradeServerService
     {
         private readonly ApplicationDbContext context;
+        private readonly IStatisticService statisticService;
 
-        public TradeServerService(ApplicationDbContext context)
+        public TradeServerService(ApplicationDbContext context, IStatisticService statisticService)
         {
             this.context = context;
+            this.statisticService = statisticService;
         }
 
         public OperationResult<TradeServerViewModel> GetInitData(Guid tradeServerId)
@@ -29,7 +32,7 @@ namespace GenesisVision.Tournament.Core.Services
                 //                  .ToTradeServer();
 
                 var tournament = context.Tournaments
-                                        .FirstOrDefault(x => x.IsEnabled && x.DateFrom > DateTime.Now)?
+                                        .FirstOrDefault(x => x.IsEnabled && x.DateTo > DateTime.Now)?
                                         .ToTournament();
 
                 var newParticipants = context.Participants
@@ -113,81 +116,11 @@ namespace GenesisVision.Tournament.Core.Services
                 account.TotalProfit += trade.Profit;
                 account.TotalProfitInPercent = account.TotalProfit / account.StartBalance * 100m;
 
-                RecalculateChart(account);
-
                 context.SaveChanges();
+
+                statisticService.RecalculateChart(account);
+                statisticService.RecalculatePlaces();
             });
-        }
-
-        private void RecalculateChart(TradeAccounts account, int pointsCount = 30, ChartType type = ChartType.ByProfit)
-        {
-            var result = new List<decimal> {0};
-            
-            var startBalance = account.StartBalance;
-            var profits = account.Trades
-                                 .OrderBy(x => x.Date)
-                                 .Select(x => x.Profit)
-                                 .ToList();
-
-            var statistic = new List<decimal>();
-            var balances = new List<decimal>();
-            for (var i = 0; i < profits.Count; i++)
-            {
-                if (i == 0)
-                {
-                    statistic.Add((startBalance + profits[i]) / startBalance * 100m - 100m);
-                    balances.Add(startBalance + profits[i]);
-                }
-                else
-                {
-                    statistic.Add((balances[i - 1] + profits[i]) / startBalance * 100m - 100m);
-                    balances.Add(balances[i - 1] + profits[i]);
-                }
-            }
-
-            var list = new List<List<decimal>>();
-            var step = statistic.Count <= pointsCount
-                ? 1
-                : statistic.Count % pointsCount >= pointsCount / 3
-                    ? statistic.Count / pointsCount + 1
-                    : statistic.Count / pointsCount;
-
-            var count = 0;
-            do
-            {
-                list.Add(statistic.Skip(count).Take(step).ToList());
-                count += step;
-            } while (count < statistic.Count);
-
-            if (!list.Any() || !list.First().Any())
-                return;
-
-            switch (type)
-            {
-                case ChartType.ByProfit:
-                    result = list
-                        .Select(x => Math.Round(x.Average(y => y), 2))
-                        .ToList();
-                    break;
-            }
-
-            result.Add(account.TotalProfitInPercent);
-
-            context.RemoveRange(account.Charts.Where(x => x.Type == type));
-
-            var index = 0;
-            foreach (var chart in result)
-            {
-                context.Add(new Charts
-                            {
-                                Id = Guid.NewGuid(),
-                                Type = type,
-                                Index = index,
-                                TradeAccountId = account.Id,
-                                Value = chart
-                            });
-                index++;
-            }
         }
     }
 }
