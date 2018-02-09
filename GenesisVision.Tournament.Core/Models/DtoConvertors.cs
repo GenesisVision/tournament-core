@@ -84,25 +84,38 @@ namespace GenesisVision.Tournament.Core.Models
 
         public static ParticipantViewModel ToParticipantFullChartViewModel(this Participants x)
         {
-            return new ParticipantViewModel
-                   {
-                       Id = x.Id,
-                       RegDate = x.RegDate,
-                       Name = x.Name,
-                       Avatar = x.Avatar,
-                       Place = 0,
-                       IpfsHash = x.TradeAccount?.IpfsHash,
-                       Login = x.TradeAccount?.Login ?? 0,
-                       OrdersCount = x.TradeAccount?.OrdersCount ?? 0,
-                       TotalProfit = x.TradeAccount?.TotalProfit ?? 0,
-                       TotalProfitInPercent = x.TradeAccount?.TotalProfitInPercent ?? 0,
-                       StartBalance = x.TradeAccount?.StartBalance ?? 0,
-                       Chart = x.TradeAccount?
-                                .Trades?
-                                .OrderBy(c => c.Ticket)
-                                .Select(c => c.Profit)
-                                .ToList() ?? new List<decimal>()
-                   };
+            var model = new ParticipantViewModel
+                        {
+                            Id = x.Id,
+                            RegDate = x.RegDate,
+                            Name = x.Name,
+                            Avatar = x.Avatar,
+                            Place = 0,
+                            IpfsHash = x.TradeAccount?.IpfsHash,
+                            Login = x.TradeAccount?.Login ?? 0,
+                            OrdersCount = x.TradeAccount?.OrdersCount ?? 0,
+                            TotalProfit = x.TradeAccount?.TotalProfit ?? 0,
+                            TotalProfitInPercent = x.TradeAccount?.TotalProfitInPercent ?? 0,
+                            StartBalance = x.TradeAccount?.StartBalance ?? 0,
+                            Chart = new List<decimal>()
+                        };
+            if (x.TradeAccount?.Trades != null)
+            {
+                var profits = x.TradeAccount
+                               .Trades
+                               .OrderBy(c => c.Date)
+                               .Select(c => c.Profit)
+                               .ToList();
+                for (var i = 0; i < profits.Count; i++)
+                {
+                    if (i == 0)
+                        model.Chart.Add(x.TradeAccount.StartBalance + profits[i]);
+                    else
+                        model.Chart.Add(model.Chart[i - 1] + profits[i]);
+                }
+            }
+
+            return model;
         }
 
         public static TradeViewModel ToTradeViewModel(this Trades t)

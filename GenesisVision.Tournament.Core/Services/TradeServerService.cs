@@ -119,14 +119,31 @@ namespace GenesisVision.Tournament.Core.Services
             });
         }
 
-        private void RecalculateChart(TradeAccounts account, int pointsCount = 15, ChartType type = ChartType.ByProfit)
+        private void RecalculateChart(TradeAccounts account, int pointsCount = 30, ChartType type = ChartType.ByProfit)
         {
             var result = new List<decimal> {0};
+            
+            var startBalance = account.StartBalance;
+            var profits = account.Trades
+                                 .OrderBy(x => x.Date)
+                                 .Select(x => x.Profit)
+                                 .ToList();
 
-            var statistic = account.Trades
-                                   .OrderBy(x => x.Date)
-                                   .Select(x => x.Profit)
-                                   .ToList();
+            var statistic = new List<decimal>();
+            var balances = new List<decimal>();
+            for (var i = 0; i < profits.Count; i++)
+            {
+                if (i == 0)
+                {
+                    statistic.Add((startBalance + profits[i]) / startBalance * 100m - 100m);
+                    balances.Add(startBalance + profits[i]);
+                }
+                else
+                {
+                    statistic.Add((balances[i - 1] + profits[i]) / startBalance * 100m - 100m);
+                    balances.Add(balances[i - 1] + profits[i]);
+                }
+            }
 
             var list = new List<List<decimal>>();
             var step = statistic.Count <= pointsCount
@@ -153,6 +170,8 @@ namespace GenesisVision.Tournament.Core.Services
                         .ToList();
                     break;
             }
+
+            result.Add(account.TotalProfitInPercent);
 
             context.RemoveRange(account.Charts.Where(x => x.Type == type));
 
