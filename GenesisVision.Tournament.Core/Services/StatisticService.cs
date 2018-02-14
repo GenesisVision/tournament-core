@@ -38,8 +38,8 @@ namespace GenesisVision.Tournament.Core.Services
             {
                 if (i == 0)
                 {
-                    statistic.Add((startBalance + profits[i]) / startBalance * 100m - 100m);
-                    balances.Add(startBalance + profits[i]);
+                    statistic.Add(0);
+                    balances.Add(startBalance);
                 }
                 else
                 {
