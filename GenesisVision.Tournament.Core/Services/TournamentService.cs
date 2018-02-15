@@ -76,12 +76,18 @@ namespace GenesisVision.Tournament.Core.Services
                 if (!participants.Any())
                     return (new List<ParticipantViewModel>(), 0);
 
+                var total = context.Participants.Count(x => x.TradeAccount != null);
+
                 var query = context.Participants
                                    .Include(x => x.TradeAccount)
                                    .ThenInclude(x => x.Charts)
                                    .Where(x => participants.Contains(x.Id));
 
-                var total = context.Participants.Count(x => x.TradeAccount != null);
+                if (!string.IsNullOrEmpty(filter?.Name))
+                {
+                    var tmp = filter.Name.ToLower().Trim();
+                    query = query.Where(x => x.Name.ToLower().Contains(tmp));
+                }
 
                 var result = query
                     .Select(x => x.ToParticipantViewModel())
