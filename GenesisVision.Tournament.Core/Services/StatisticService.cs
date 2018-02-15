@@ -34,18 +34,12 @@ namespace GenesisVision.Tournament.Core.Services
 
             var statistic = new List<decimal>();
             var balances = new List<decimal>();
+            statistic.Add(0m);
+            balances.Add(startBalance);
             for (var i = 0; i < profits.Count; i++)
             {
-                if (i == 0)
-                {
-                    statistic.Add(0);
-                    balances.Add(startBalance);
-                }
-                else
-                {
-                    statistic.Add((balances[i - 1] + profits[i]) / startBalance * 100m - 100m);
-                    balances.Add(balances[i - 1] + profits[i]);
-                }
+                statistic.Add((balances[i] + profits[i]) / startBalance * 100m - 100m);
+                balances.Add(balances[i] + profits[i]);
             }
 
             var list = new List<List<decimal>>();
@@ -74,7 +68,10 @@ namespace GenesisVision.Tournament.Core.Services
                     break;
             }
 
-            result.Add(account.TotalProfitInPercent);
+            if (profits.Count > pointsCount)
+            {
+                result.Add(account.TotalProfitInPercent);
+            }
 
             context.RemoveRange(account.Charts.Where(x => x.Type == type));
 
