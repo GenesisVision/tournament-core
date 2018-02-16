@@ -9,7 +9,7 @@ namespace GenesisVision.Tournament.Core.Services.Interfaces
     {
         int GetParticipantPlace(Guid participantId);
 
-        List<Guid> GetParticipantsByPlace(int? skip, int? take);
+        List<Guid> GetParticipantsByPlace(int? skip, int? take, List<Guid> filteredIds);
 
         void RecalculateChart(TradeAccounts account, int pointsCount = 30, ChartType type = ChartType.ByProfit);
 

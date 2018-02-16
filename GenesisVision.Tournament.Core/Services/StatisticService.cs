@@ -136,10 +136,11 @@ namespace GenesisVision.Tournament.Core.Services
                 : -1;
         }
 
-        public List<Guid> GetParticipantsByPlace(int? skip, int? take)
+        public List<Guid> GetParticipantsByPlace(int? skip, int? take, List<Guid> filteredIds)
         {
             return TryGetObjectFromCache(ratingKey, out List<Guid> value)
-                ? value.Skip(skip ?? 0)
+                ? value.Where(x => !filteredIds.Any() || filteredIds.Contains(x))
+                       .Skip(skip ?? 0)
                        .Take(take ?? int.MaxValue)
                        .ToList()
                 : new List<Guid>();

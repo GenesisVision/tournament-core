@@ -72,23 +72,32 @@ namespace GenesisVision.Tournament.Core.Services
         {
             return InvokeOperations.InvokeOperation(() =>
             {
-                var participants = statisticService.GetParticipantsByPlace(filter?.Skip, filter?.Take);
+                var filteredIds = new List<Guid>();
+                if (!string.IsNullOrEmpty(filter?.Name))
+                {
+                    var tmp = filter.Name.ToLower().Trim();
+                    filteredIds = context.Participants
+                                         .Where(x => x.TradeAccount != null && x.Name.ToLower().Contains(tmp))
+                                         .Select(x => x.Id)
+                                         .ToList();
+
+                    if (!filteredIds.Any())
+                        return (new List<ParticipantViewModel>(), 0);
+                }
+
+                var participants = statisticService.GetParticipantsByPlace(filter?.Skip, filter?.Take, filteredIds);
                 if (!participants.Any())
                     return (new List<ParticipantViewModel>(), 0);
 
-                var total = context.Participants.Count(x => x.TradeAccount != null);
+                var total = filteredIds.Any()
+                    ? filteredIds.Count
+                    : context.Participants.Count(x => x.TradeAccount != null);
 
                 var query = context.Participants
                                    .Include(x => x.TradeAccount)
                                    .ThenInclude(x => x.Charts)
                                    .Where(x => participants.Contains(x.Id));
-
-                if (!string.IsNullOrEmpty(filter?.Name))
-                {
-                    var tmp = filter.Name.ToLower().Trim();
-                    query = query.Where(x => x.Name.ToLower().Contains(tmp));
-                }
-
+                
                 var result = query
                     .Select(x => x.ToParticipantViewModel())
                     .ToList()
