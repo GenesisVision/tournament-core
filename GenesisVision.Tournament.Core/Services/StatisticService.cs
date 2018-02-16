@@ -28,6 +28,7 @@ namespace GenesisVision.Tournament.Core.Services
 
             var startBalance = account.StartBalance;
             var profits = account.Trades
+                                 .Where(x => x.Entry != TradeEntry.In)
                                  .OrderBy(x => x.Date)
                                  .Select(x => x.Profit)
                                  .ToList();

@@ -10,6 +10,7 @@ namespace GenesisVision.DataModel.Models
         public DateTime Date { get; set; }
         public string Symbol { get; set; }
         public TradeDirection Direction { get; set; }
+        public TradeEntry Entry { get; set; }
         public decimal Price { get; set; }
         public decimal Profit { get; set; }
         public decimal Volume { get; set; }

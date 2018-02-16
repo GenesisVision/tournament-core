@@ -1,4 +1,5 @@
 ﻿using GenesisVision.DataModel;
+using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
@@ -107,6 +108,7 @@ namespace GenesisVision.Tournament.Core.Services
                             TradeAccountId = account.Id,
                             Date = trade.Date,
                             Direction = trade.Direction,
+                            Entry = trade.Entry,
                             Price = trade.Price,
                             Profit = trade.Profit,
                             Symbol = trade.Symbol,
@@ -115,9 +117,12 @@ namespace GenesisVision.Tournament.Core.Services
                         };
                 context.Add(t);
 
-                account.OrdersCount += 1;
-                account.TotalProfit += trade.Profit;
-                account.TotalProfitInPercent = account.TotalProfit / account.StartBalance * 100m;
+                if (trade.Entry != TradeEntry.In)
+                {
+                    account.OrdersCount += 1;
+                    account.TotalProfit += trade.Profit;
+                    account.TotalProfitInPercent = account.TotalProfit / account.StartBalance * 100m;
+                }
 
                 context.SaveChanges();
 
@@ -143,7 +148,7 @@ namespace GenesisVision.Tournament.Core.Services
             {
                 Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
 
-                var csv = new StringBuilder($"\"Login\";\"Ticket\";\"Symbol\";\"Price\";\"Profit\";\"Volume\";\"Date\";\"Direction\";{Environment.NewLine}");
+                var csv = new StringBuilder($"\"Login\";\"Ticket\";\"Symbol\";\"Price\";\"Profit\";\"Volume\";\"Date\";\"Direction\";\"Entry\";{Environment.NewLine}");
 
                 foreach (var trade in account.Trades.OrderBy(x => x.Date))
                 {
@@ -154,7 +159,8 @@ namespace GenesisVision.Tournament.Core.Services
                                    $"\"{trade.Profit}\";" +
                                    $"\"{trade.Volume}\";" +
                                    $"\"{trade.Date:yyyy-MM-dd HH:mm:ss}\";" +
-                                   $"\"{trade.Direction}\";");
+                                   $"\"{trade.Direction}\";" +
+                                   $"\"{trade.Entry}\";");
                 }
                 return csv.ToString();
             });
