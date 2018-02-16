@@ -55,6 +55,9 @@ namespace GenesisVision.Tournament.Core
             services.AddTransient<ITournamentService, TournamentService>();
             services.AddTransient<ITradeServerService, TradeServerService>();
             services.AddTransient<IStatisticService, StatisticService>();
+            services.AddTransient<IIpfsService, IpfsService>();
+
+            Constants.IpfsHost = Configuration["IpfsHost"];
 
             services.AddSwaggerGen(c =>
             {

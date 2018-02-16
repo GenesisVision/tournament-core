@@ -1,5 +1,4 @@
 ﻿using GenesisVision.DataModel;
-using GenesisVision.DataModel.Enums;
 using GenesisVision.DataModel.Models;
 using GenesisVision.Tournament.Core.Models;
 using GenesisVision.Tournament.Core.Services.Interfaces;
@@ -7,8 +6,10 @@ using GenesisVision.Tournament.Core.ViewModels.TradeServer;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text;
+using System.Threading;
 
 namespace GenesisVision.Tournament.Core.Services
 {
@@ -16,11 +17,13 @@ namespace GenesisVision.Tournament.Core.Services
     {
         private readonly ApplicationDbContext context;
         private readonly IStatisticService statisticService;
+        private readonly IIpfsService ipfsService;
 
-        public TradeServerService(ApplicationDbContext context, IStatisticService statisticService)
+        public TradeServerService(ApplicationDbContext context, IStatisticService statisticService, IIpfsService ipfsService)
         {
             this.context = context;
             this.statisticService = statisticService;
+            this.ipfsService = ipfsService;
         }
 
         public OperationResult<TradeServerViewModel> GetInitData(Guid tradeServerId)
@@ -118,8 +121,42 @@ namespace GenesisVision.Tournament.Core.Services
 
                 context.SaveChanges();
 
+                var trades = GetTradeHistory(account);
+                if (trades.IsSuccess)
+                {
+                    var ipfsHash = ipfsService.WriteIpfsText(trades.Data);
+                    if (ipfsHash.IsSuccess)
+                    {
+                        account.IpfsHash = ipfsHash.Data;
+                        context.SaveChanges();
+                    }
+                }
+
                 statisticService.RecalculateChart(account);
                 statisticService.RecalculatePlaces();
+            });
+        }
+
+        private static OperationResult<string> GetTradeHistory(TradeAccounts account)
+        {
+            return InvokeOperations.InvokeOperation(() =>
+            {
+                Thread.CurrentThread.CurrentCulture = CultureInfo.CreateSpecificCulture("en-US");
+
+                var csv = new StringBuilder($"\"Login\";\"Ticket\";\"Symbol\";\"Price\";\"Profit\";\"Volume\";\"Date\";\"Direction\";{Environment.NewLine}");
+
+                foreach (var trade in account.Trades.OrderBy(x => x.Date))
+                {
+                    csv.AppendLine($"\"{account.Login}\";" +
+                                   $"\"{trade.Ticket}\";" +
+                                   $"\"{trade.Symbol}\";" +
+                                   $"\"{trade.Price}\";" +
+                                   $"\"{trade.Profit}\";" +
+                                   $"\"{trade.Volume}\";" +
+                                   $"\"{trade.Date:yyyy-MM-dd HH:mm:ss}\";" +
+                                   $"\"{trade.Direction}\";");
+                }
+                return csv.ToString();
             });
         }
     }
